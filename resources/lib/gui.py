@@ -156,9 +156,15 @@ class Screensaver(xbmcgui.WindowXMLDialog):
                         self.image3.setImage(img[0],False)
                     else:
                         self.image4.setImage(img[0],False)
-                # give xbmc some time to load the image
+                # On startup directly load image and the next image as well
+                # otherwise wait the slideshow time (This will give the most time for xbmc to load the images)
                 if not self.startup:
-                    xbmc.sleep(1000)
+                    # slideshow time in secs
+                    count = self.slideshow_time
+                    # display the image for the specified amount of time
+                    while (not self.Monitor.abortRequested()) and (not self.stop) and count > 0:
+                        count -= 1
+                        xbmc.sleep(1000)
                 else:
                     self.startup = False
                 # get exif and iptc tags if enabled in settings and we have an image that can contain this data
@@ -284,12 +290,6 @@ class Screensaver(xbmcgui.WindowXMLDialog):
                 else:
                     cur_img = self.image1
                     order = [1,2]
-                # slideshow time in secs (we already slept for 1 second)
-                count = self.slideshow_time - 1
-                # display the image for the specified amount of time
-                while (not self.Monitor.abortRequested()) and (not self.stop) and count > 0:
-                    count -= 1
-                    xbmc.sleep(1000)
                 # break out of the for loop if onScreensaverDeactivated is called
                 if  self.stop or self.Monitor.abortRequested():
                     break
